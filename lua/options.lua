@@ -22,5 +22,8 @@ opt.ignorecase = true
 opt.smartcase = true
 opt.incsearch = true
 opt.hlsearch = true
+
+opt.number = true
+opt.relativenumber = true
 -- local o = vim.o
 -- o.cursorlineopt ='both' -- to enable cursorline!

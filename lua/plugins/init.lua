@@ -49,9 +49,9 @@ return {
     vim.cmd([[autocmd FileType alpha setlocal nofoldenable]])
     end,
   },
-  {
+  { --formatter
     "stevearc/conform.nvim",
-    -- event = 'BufWritePre', -- uncomment for format on save
+    event = 'BufWritePre', -- uncomment for format on save
     opts = require "configs.conform",
   },
 
@@ -68,9 +68,38 @@ return {
       ensure_installed = {
         "ts_ls",
         "pyright",
-        "clangd"
+        "clangd",
+        "gopls",
+        "goimports",
+        "gofumpt",
+        "golangci-lint",
+        "lua-language-server",
+        "stylua",
       }
     }
+  },
+  {-- Linter (nvim-lint) 
+    "mfussenegger/nvim-lint",
+    event = { "BufReadPost", "BufNewFile", "BufWritePost" },
+    config = function()
+      local lint = require "lint"
+      lint.linters_by_ft = {
+        go = { "golangcilint" },
+        lua = { "luacheck" },
+        python = { "pylint" },
+        javascript = { "eslint" },
+        typescript = { "eslint" },
+      }
+
+      -- Auto-run linter on these events
+      local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
+      vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
+        group = lint_augroup,
+        callback = function()
+          require("lint").try_lint()
+        end,
+      })
+    end,
   },
   {
     "lukas-reineke/indent-blankline.nvim",
@@ -108,15 +137,32 @@ return {
       "MunifTanjim/nui.nvim",
     }
   },
-
-
-  -- {
-  -- 	"nvim-treesitter/nvim-treesitter",
-  -- 	opts = {
-  -- 		ensure_installed = {
-  -- 			"vim", "lua", "vimdoc",
-  --      "html", "css"
-  -- 		},
-  -- 	},
-  -- },
+  {
+    "echasnovski/mini.surround",
+    version = "*",
+    config = function()
+      require("mini.surround").setup({
+        -- Use default keymaps for mini.surround:
+        mappings = {
+          add = "sa",      -- Add surrounding (e.g., sa')
+          delete = "sd",   -- Delete surrounding (e.g., sd')
+          replace = "sr",  -- Replace surrounding (e.g., sr'")
+          find = "sf",     -- Find surrounding to the right
+          find_left = "sF",-- Find surrounding to the left
+        },
+      })
+    end,
+  },
+  {
+    "ThePrimeagen/vim-be-good",
+    lazy = false,  -- Load on startup
+  },
+  {
+    "hrsh7th/nvim-cmp",
+    dependencies = {
+      "hrsh7th/cmp-nvim-lsp",
+      "hrsh7th/cmp-buffer",
+      "hrsh7th/cmp-path",
+  },
+}
 }
