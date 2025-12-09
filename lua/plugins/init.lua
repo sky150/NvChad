@@ -1,13 +1,13 @@
 return {
   {
-  "goolord/alpha-nvim",
-  event = "VimEnter",
-  config = function()
-    local alpha = require("alpha")
-    local dashboard = require("alpha.themes.dashboard")
+    "goolord/alpha-nvim",
+    event = "VimEnter",
+    config = function()
+      local alpha = require "alpha"
+      local dashboard = require "alpha.themes.dashboard"
 
-    -- Set header
-    --[[test_code = {
+      -- Set header
+      --[[test_code = {
       "                                                       ",
       "⠈⠙⠲⢶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣿⡀⠀⠀⠀⠀⠀⠀⠀⡄⠀⠀⡄⠀⠀⠀⠀⠀⠀⠀⣼⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣿⠟⠓⠉",
 ⠀⠀⠀⠀  "    ⠈⠙⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣄⠀⠀⠀⠀⠀⢀⣧⣶⣦⣇⠀⠀⠀⠀⠀⢀⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠉⠀⠀⠀⠀",
@@ -20,7 +20,7 @@ return {
 ⠀⠀⠀⠀⠀⠀"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀     ⠹⣿⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀  ",⠀
       "                                                       ",
     }]]
-    dashboard.section.header.val = {
+      dashboard.section.header.val = {
         "                                                       ",
         " ⠈⠙⠲⢶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣿⡀⠀⠀⠀⠀⠀⠀⠀⡄⠀⠀⡄⠀⠀⠀⠀⠀⠀⠀⣼⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣶⣿⠟⠓⠉",
         "     ⠈⠙⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣄⠀⠀⠀⠀⠀⢀⣧⣶⣦⣇⠀⠀⠀⠀⠀⢀⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠉⠀⠀⠀⠀    ",
@@ -32,26 +32,26 @@ return {
         "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀        ⠉⠻⣿⣿⣿⡿⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀",
         "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀        ⠹⣿⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀",
         "                                                   ",
-    }
-    -- Set menu
-    dashboard.section.buttons.val = {
-      dashboard.button("SPC e", "  > Toggle file explorer"),
-      dashboard.button("SPC ff", "󰱼 > Find File", "<cmd>Telescope find_files<CR>"),
-      dashboard.button("SPC fs", "  > Find Word", "<cmd>Telescope live_grep<CR>"),
-      dashboard.button("SPC wr", "󰁯  > Restore Session For Current Directory", "<cmd>SessionRestore<CR>"),
-      dashboard.button("q", " > Quit NVIM", "<cmd>qa<CR>"),
-    }
+      }
+      -- Set menu
+      dashboard.section.buttons.val = {
+        dashboard.button("SPC e", "  > Toggle file explorer"),
+        dashboard.button("SPC ff", "󰱼 > Find File", "<cmd>Telescope find_files<CR>"),
+        dashboard.button("SPC fs", "  > Find Word", "<cmd>Telescope live_grep<CR>"),
+        dashboard.button("SPC wr", "󰁯  > Restore Session For Current Directory", "<cmd>SessionRestore<CR>"),
+        dashboard.button("q", " > Quit NVIM", "<cmd>qa<CR>"),
+      }
 
-    -- Send config to alpha
-    alpha.setup(dashboard.opts)
+      -- Send config to alpha
+      alpha.setup(dashboard.opts)
 
-    -- Disable folding on alpha buffer
-    vim.cmd([[autocmd FileType alpha setlocal nofoldenable]])
+      -- Disable folding on alpha buffer
+      vim.cmd [[autocmd FileType alpha setlocal nofoldenable]]
     end,
   },
   { --formatter
     "stevearc/conform.nvim",
-    event = 'BufWritePre', -- uncomment for format on save
+    event = "BufWritePre", -- uncomment for format on save
     opts = require "configs.conform",
   },
 
@@ -75,10 +75,13 @@ return {
         "golangci-lint",
         "lua-language-server",
         "stylua",
-      }
-    }
+        "astro-language-server",
+        "tailwindcss-language-server",
+        "eslint-lsp",
+      },
+    },
   },
-  {-- Linter (nvim-lint) 
+  { -- Linter (nvim-lint)
     "mfussenegger/nvim-lint",
     event = { "BufReadPost", "BufNewFile", "BufWritePost" },
     config = function()
@@ -135,27 +138,27 @@ return {
       "nvim-lua/plenary.nvim",
       "nvim-tree/nvim-web-devicons",
       "MunifTanjim/nui.nvim",
-    }
+    },
   },
   {
     "echasnovski/mini.surround",
     version = "*",
     config = function()
-      require("mini.surround").setup({
+      require("mini.surround").setup {
         -- Use default keymaps for mini.surround:
         mappings = {
-          add = "sa",      -- Add surrounding (e.g., sa')
-          delete = "sd",   -- Delete surrounding (e.g., sd')
-          replace = "sr",  -- Replace surrounding (e.g., sr'")
-          find = "sf",     -- Find surrounding to the right
-          find_left = "sF",-- Find surrounding to the left
+          add = "sa", -- Add surrounding (e.g., sa')
+          delete = "sd", -- Delete surrounding (e.g., sd')
+          replace = "sr", -- Replace surrounding (e.g., sr'")
+          find = "sf", -- Find surrounding to the right
+          find_left = "sF", -- Find surrounding to the left
         },
-      })
+      }
     end,
   },
   {
     "ThePrimeagen/vim-be-good",
-    lazy = false,  -- Load on startup
+    lazy = false, -- Load on startup
   },
   {
     "hrsh7th/nvim-cmp",
@@ -163,6 +166,33 @@ return {
       "hrsh7th/cmp-nvim-lsp",
       "hrsh7th/cmp-buffer",
       "hrsh7th/cmp-path",
+    },
   },
-}
+  {
+    "nvim-treesitter/nvim-treesitter",
+    event = { "BufReadPre", "BufNewFile" },
+    config = function()
+      require("nvim-treesitter.configs").setup {
+        ensure_installed = { "lua", "vim", "javascript", "typescript", "tsx", "astro", "html", "css", "json" },
+        highlight = { enable = true },
+        indent = { enable = true },
+      }
+    end,
+  },
+
+  -- 4. AUTOTAG (Keep this, it connects to Treesitter)
+  {
+    "windwp/nvim-ts-autotag",
+    ft = { "javascript", "javascriptreact", "typescript", "typescriptreact", "astro" },
+    config = function()
+      require("nvim-ts-autotag").setup()
+    end,
+  },
+  {
+    "echasnovski/mini.surround",
+    version = false,
+    config = function()
+      require("mini.surround").setup()
+    end,
+  },
 }

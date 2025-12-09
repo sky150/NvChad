@@ -1,64 +1,89 @@
--- load defaults i.e lua_lsp
-require("nvchad.configs.lspconfig").defaults()
-
 local nvlsp = require "nvchad.configs.lspconfig"
--- Using the NEW vim.lsp.config() syntax for Neovim 0.11+
-local servers = {
-  "html",
-  "cssls",
-  "ts_ls",
-  "tailwindcss",
-  "jsonls",
-  "lua_ls",
-  "eslint",
-  "pyright",
-  "clangd",
-  "gopls"
-}
 
+-- 1. NATIVE HELPER (With safer root detection)
+local function start(config)
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = config.filetypes,
+    callback = function(ev)
+      -- Safer root detection: Default to CWD, then try to find package.json
+      local root = vim.loop.cwd()
+      if ev.file and ev.file ~= "" then
+        local found = vim.fs.find({ "package.json", ".git" }, { path = ev.file, upward = true })[1]
+        if found then
+          root = vim.fs.dirname(found)
+        end
+      end
 
--- Setup servers using vim.lsp.config (NEW way)
-for _, lsp in ipairs(servers) do
-  vim.lsp.config(lsp, {
-    on_attach = nvlsp.on_attach,
-    on_init = nvlsp.on_init,
-    capabilities = nvlsp.capabilities,
+      local client_config = vim.tbl_deep_extend("force", {
+        name = config.name,
+        cmd = config.cmd,
+        root_dir = root,
+        capabilities = nvlsp.capabilities,
+        on_attach = nvlsp.on_attach,
+        on_init = nvlsp.on_init,
+        settings = config.settings,
+        init_options = config.init_options,
+      }, config.overrides or {})
+
+      vim.lsp.start(client_config)
+    end,
   })
 end
 
--- Optional: Add Go-specific settings for gopls
-vim.lsp.config("gopls", {
-  on_attach = nvlsp.on_attach,
-  on_init = nvlsp.on_init,
-  capabilities = nvlsp.capabilities,
+-- ==========================================================
+-- 2. SERVER LIST
+-- ==========================================================
+
+-- A. Simple Servers
+start { name = "html", cmd = { "vscode-html-language-server", "--stdio" }, filetypes = { "html" } }
+start { name = "cssls", cmd = { "vscode-css-language-server", "--stdio" }, filetypes = { "css", "scss" } }
+start {
+  name = "tailwindcss",
+  cmd = { "tailwindcss-language-server", "--stdio" },
+  filetypes = { "astro", "typescriptreact", "javascriptreact", "html", "css" },
+}
+start { name = "gopls", cmd = { "gopls" }, filetypes = { "go", "gomod" } }
+
+-- B. ESLint (THE FIX IS HERE)
+start {
+  name = "eslint",
+  cmd = { "vscode-eslint-language-server", "--stdio" },
+  filetypes = { "javascript", "typescript", "typescriptreact", "javascriptreact" },
   settings = {
-    gopls = {
-      completeUnimported = true,
-      usePlaceholders = true,
-      analyses = {
-        unusedparams = true,
-      },
-      staticcheck = true,
+    -- These settings prevent the "path undefined" crash
+    codeActionOnSave = { enable = false, mode = "all" },
+    experimental = { useFlatConfig = false },
+    format = false,
+    nodePath = "",
+    quiet = false,
+    run = "onType",
+    validate = "on",
+    workingDirectory = { mode = "auto" },
+  },
+}
+
+-- C. TypeScript / React
+start {
+  name = "ts_ls",
+  cmd = { "typescript-language-server", "--stdio" },
+  filetypes = { "typescript", "typescriptreact", "javascript", "javascriptreact" },
+  init_options = {
+    preferences = {
+      includeCompletionsForModuleExports = true,
+      includeCompletionsWithInsertText = true,
+      importModuleSpecifierPreference = "non-relative",
     },
   },
-})
+}
 
--- Backup: Auto-start gopls for Go files (in case vim.lsp.config doesn't trigger)
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "go", "gomod", "gowork", "gotmpl" },
-  callback = function()
-    -- Check if gopls is already attached
-    local clients = vim.lsp.get_clients({ bufnr = 0 })
-    for _, client in ipairs(clients) do
-      if client.name == "gopls" then
-        return  -- Already attached, don't start again
-      end
-    end
-    -- Start gopls
-    vim.lsp.start({
-      name = "gopls",
-      cmd = { "gopls" },
-      root_dir = vim.fs.dirname(vim.fs.find({ "go.mod", "go.work", ".git" }, { upward = true })[1]),
-    })
-  end,
-})
+-- D. Astro
+start {
+  name = "astro",
+  cmd = { "astro-ls", "--stdio" },
+  filetypes = { "astro" },
+  init_options = {
+    typescript = {
+      tsdk = vim.fn.stdpath "data" .. "/mason/packages/typescript-language-server/node_modules/typescript/lib",
+    },
+  },
+}
