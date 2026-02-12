@@ -43,7 +43,20 @@ start {
   filetypes = { "astro", "typescriptreact", "javascriptreact", "html", "css" },
 }
 start { name = "gopls", cmd = { "gopls" }, filetypes = { "go", "gomod" } }
-
+start {
+  name = "pyright",
+  cmd = { "pyright-langserver", "--stdio" },
+  filetypes = { "python" },
+  settings = {
+    python = {
+      analysis = {
+        autoSearchPaths = true,
+        useLibraryCodeForTypes = true,
+        diagnosticMode = "workspace",
+      },
+    },
+  },
+}
 -- B. ESLint (THE FIX IS HERE)
 start {
   name = "eslint",
